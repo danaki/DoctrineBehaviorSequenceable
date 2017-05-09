@@ -1,6 +1,13 @@
 ## Sequenceable behavior extension for Doctrine2
 
-**Sequenceable** behavior will backup entities on changing. It works through annotations and can backups
+[![LICENSE](https://img.shields.io/badge/release-0.0.0-blue.svg?style=flat)](https://github.com/Fincallorca/DoctrineBehaviorSequenceable/releases/tag/0.0.0)
+[![Packagist](https://img.shields.io/badge/Packagist-0.0.0-blue.svg?style=flat)](https://packagist.org/packages/fincallorca/doctrine-behaviors)
+[![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
+[![https://jquery.com/](https://img.shields.io/badge/Symfony-≥3-red.svg?style=flat)](https://symfony.com/)
+[![https://jquery.com/](https://img.shields.io/badge/Doctrine-≥2.2-red.svg?style=flat)](http://www.doctrine-project.org/)
+
+
+**Sequenceable** behavior will backup entities on changing. It works through annotations and can backup
 the entity on every update.
 
 Features:
@@ -13,10 +20,26 @@ Restrictions:
 - tested only with MySQL/MariaDB
 - tested only with annotations
 
+### Table of Contents
 
-### Setup
+* [Integration](#integration)
+  * [Install via Composer](#install-via-composer)
+  * [Add Bundle to Symfony Application](#add-bundle-to-symfony-application)
+* [The Basics](#the-basics)
+  * [Use traits](#use-traits)
+  
 
-#### Add bundle to app/AppKernel.php
+### 1. Integration
+
+#### 1.1. Install via Composer
+
+```bash
+composer require fincallorca/doctrine-behaviors "dev-master"
+```
+
+#### 1.2. Add Bundle to Symfony Application
+
+##### Add the `SequenceableBundle` to `app/AppKernel.php`
 
 ``` php
 
@@ -29,7 +52,7 @@ class AppKernel extends Kernel
     {
         return [
             // [...]
-            new SequenceableBundle\SequenceableBundle(),
+            new \Fincallorca\DoctrineBehaviors\SequenceableBundle\SequenceableBundle(),
         ];
     }
     
@@ -37,21 +60,22 @@ class AppKernel extends Kernel
 }
 ```
 
+##### Add ORM Filter to Configuration
 
-#### Add ORM Filter
+Via the `config.yml`
 
-    doctrine:
-        orm:
-            entity_managers:
-                default:
-                    filters:
-                        sequenceable_filter:
-                            class:   SequenceableBundle\Filter\SequenceableFilter
-                            enabled: true
+```yaml
+doctrine:
+  orm:
+    entity_managers:
+      default:
+        filters:
+          sequenceable_filter:
+            class:   SequenceableBundle\Filter\SequenceableFilter
+            enabled: true
+```
 
-<a name="traits"></a>
-
-### Usage
+### The Basics
 
 #### Use traits
 
