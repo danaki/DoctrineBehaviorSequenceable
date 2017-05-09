@@ -52,7 +52,7 @@ class AppKernel extends Kernel
     {
         return [
             // [...]
-            new \Fincallorca\DoctrineBehaviors\SequenceableBundle\SequenceableBundle(),
+            new Fincallorca\DoctrineBehaviors\SequenceableBundle\SequenceableBundle(),
         ];
     }
     
@@ -71,7 +71,7 @@ doctrine:
       default:
         filters:
           sequenceable_filter:
-            class:   SequenceableBundle\Filter\SequenceableFilter
+            class:   Fincallorca\DoctrineBehaviors\SequenceableBundle\EventListener\SequenceableSubscriber
             enabled: true
 ```
 
