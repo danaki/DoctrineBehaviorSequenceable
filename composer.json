@@ -1,0 +1,27 @@
+{
+  "name": "fincallorca/doctrine-behaviors",
+  "type": "library",
+  "description": "Doctrine2 behavior Sequenceable trait",
+  "keywords": [
+	"behaviors",
+	"doctrine2",
+	"sequenceable"
+  ],
+  "license": "MIT",
+  "authors": [
+	{
+	  "name": "Falko Matthies",
+	  "email": "falko.m@web.de"
+	}
+  ],
+  "require": {
+	"php": ">=5.4",
+	"doctrine/common": ">=2.2",
+	"symfony/framework-bundle": "~3.0"
+  },
+  "autoload": {
+	"psr-4": {
+	  "Fincallorca\\DoctrineBehaviors\\": "src/"
+	}
+  }
+}

@@ -1,0 +1,5 @@
+services:
+  sequenceable:
+    class: SequenceableBundle\EventListener\SequenceableSubscriber
+    tags:
+      - { name: doctrine.event_subscriber, connection: default }
