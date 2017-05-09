@@ -1,21 +1,23 @@
 ## Sequenceable behavior extension for Doctrine2
 
-[![LICENSE](https://img.shields.io/badge/release-0.0.0-blue.svg?style=flat)](https://github.com/Fincallorca/DoctrineBehaviorSequenceable/releases/tag/0.0.0)
-[![Packagist](https://img.shields.io/badge/Packagist-0.0.0-blue.svg?style=flat)](https://packagist.org/packages/fincallorca/doctrine-behaviors)
+[![LICENSE](https://img.shields.io/badge/release-0.0.1-blue.svg?style=flat)](https://github.com/Fincallorca/DoctrineBehaviorSequenceable/releases/tag/0.0.1)
+[![Packagist](https://img.shields.io/badge/Packagist-0.0.1-blue.svg?style=flat)](https://packagist.org/packages/fincallorca/doctrine-behaviors)
 [![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
 [![https://jquery.com/](https://img.shields.io/badge/Symfony-≥3-red.svg?style=flat)](https://symfony.com/)
 [![https://jquery.com/](https://img.shields.io/badge/Doctrine-≥2.2-red.svg?style=flat)](http://www.doctrine-project.org/)
 
 
-**Sequenceable** behavior will backup entities on changing. It works through annotations and can backup
-the entity on every update.
+In addition to the [DoctrineExtensions library](https://github.com/Atlantic18/DoctrineExtensions) or the [Doctrine Behaviors of KNP Labs](https://github.com/KnpLabs/DoctrineBehaviors)
+this Bundle add a **sequence** behaviour to your entities.
 
-Features:
+The **Sequenceable** behavior backups entities on changing. Like other behaviours the bundle works through annotations.
+
+**Features**:
 
 - Specific annotations for properties
 - Compatible with other behaviours (KNP, Gedmo, etc.)
 
-Restrictions:
+**Restrictions**:
 
 - tested only with MySQL/MariaDB
 - tested only with annotations
@@ -29,15 +31,15 @@ Restrictions:
   * [Use traits](#use-traits)
   
 
-### 1. Integration
+### Integration
 
-#### 1.1. Install via Composer
+#### Install via Composer
 
 ```bash
 composer require fincallorca/doctrine-behaviors "dev-master"
 ```
 
-#### 1.2. Add Bundle to Symfony Application
+#### Add Bundle to Symfony Application
 
 ##### Add the `SequenceableBundle` to `app/AppKernel.php`
 
