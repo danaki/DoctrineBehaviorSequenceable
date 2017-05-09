@@ -1,5 +1,5 @@
 services:
   sequenceable:
-    class: SequenceableBundle\EventListener\SequenceableSubscriber
+    class: Fincallorca\DoctrineBehaviors\SequenceableBundle\EventListener\SequenceableSubscriber
     tags:
       - { name: doctrine.event_subscriber, connection: default }
