@@ -318,7 +318,7 @@ class SequenceableEntityContainer
 
 				$mapping = $this->_classMetadata->getAssociationMapping($_field);
 
-				$query_builder->innerJoin($mapping[ 'targetEntity' ], 't1', Join::WITH, $query_builder->expr()->eq(
+				$query_builder->innerJoin($mapping[ 'targetEntity' ], self::_GetAlias($alias_index), Join::WITH, $query_builder->expr()->eq(
 					self::_GetAlias($alias_index),
 					sprintf('%s.%s', self::_GetAlias(0), $_field))
 				);
