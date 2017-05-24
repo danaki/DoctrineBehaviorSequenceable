@@ -90,8 +90,7 @@ identifier for the sequence column to search for the amount of already existing 
 <?php
 
 use Doctrine\ORM\Mapping as ORM;
-use Fincallorca\DoctrineBehaviors\SequenceableBundle\Entity\Sequenceable;
-use Fincallorca\DoctrineBehaviors\SequenceableBundle\Annotation\SequenceableID;
+use Fincallorca\DoctrineBehaviors\SequenceableBundle as SequenceableBehavior;
 
 /**
  * @ORM\Entity
@@ -102,7 +101,7 @@ class MyEntity
     /**
      * Hook sequenceable behavior (adds field sequenceable).
      */
-    use Sequenceable;
+    use SequenceableBehavior\Entity\Sequenceable;
 
     /**
      * @ORM\Id
@@ -113,13 +112,8 @@ class MyEntity
 
     /**
      * @ORM\Column(length=128)
-     * @SequenceableID
+     * @SequenceableBehavior\Annotation\SequenceableID
      */
     private $title;
 }
 ```
-
-##### Unique index
-
-To ensure database integrity a unique index for the SequenceableID field(s) and the sequence field
-will be automatically added.
