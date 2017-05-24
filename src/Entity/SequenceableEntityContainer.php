@@ -417,6 +417,75 @@ class SequenceableEntityContainer
 	}
 
 	/**
+	 * Returns the (current/sequence=`0`) soft-deleted entity for a entity which should be inserted as a new entity
+	 * or `null` if no soft-deleted entity exists.
+	 *
+	 * @param EntityManager $entity_manager
+	 * @param Sequenceable  $entity_to_insert
+	 *
+	 * @return Sequenceable|null
+	 */
+	public function getDeletedEntity(EntityManager $entity_manager, $entity_to_insert)
+	{
+		$query_builder = $entity_manager->createQueryBuilder()
+			->from($this->_className, self::_GetAlias(0))
+			->select(self::_GetAlias(0))
+			->andWhere(sprintf('%s.sequence = 0', self::_GetAlias(0)));
+
+		$alias_index = 0;
+
+		$field = null;
+
+		foreach( $this->_sequenceableIdFields as $_field )
+		{
+			// mapping field
+			if( $this->_classMetadata->hasAssociation($_field) )
+			{
+				$alias_index++;
+
+				$_referenced_entity = $this->_classMetadata->getFieldValue($entity_to_insert, $_field);
+
+				$query_builder->andWhere(sprintf('%s.%s = ?%d',
+					self::_GetAlias(0),
+					$_field,
+					$alias_index
+				));
+
+				$query_builder->setParameter($alias_index, $_referenced_entity);
+
+			} // scalar field
+			else
+			{
+				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_field))->convertToDatabaseValue(
+					$this->_classMetadata->getFieldValue($entity_to_insert, $_field),
+					$entity_manager->getConnection()->getDatabasePlatform()
+				);
+
+				$query_builder
+					->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_field))
+					->setParameter($_field, $_field_value);
+			}
+		}
+
+		$this->_disableSoftDeleteableFilters($entity_manager);
+
+		try
+		{
+			$result = $query_builder->getQuery()->getSingleResult();
+		}
+		catch( NoResultException $exception )
+		{
+			$result = null;
+		}
+		finally
+		{
+			$this->_enableSoftDeleteableFilters($entity_manager);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Clone of method {@see AbstractAsset::_generateIdentifierName()}.
 	 *
 	 * Generates an identifier from a list of column names obeying a certain string length.
