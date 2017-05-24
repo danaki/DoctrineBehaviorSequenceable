@@ -280,7 +280,7 @@ class SequenceableEntityContainer
 	 *
 	 * @author Falko Matthies <falko.ma@web.de>
 	 */
-	public function getClassMetadata(): ClassMetadata
+	public function getClassMetadata()
 	{
 		return $this->_classMetadata;
 	}
@@ -292,7 +292,7 @@ class SequenceableEntityContainer
 	 *
 	 * @author Falko Matthies <falko.ma@web.de>
 	 */
-	public function getClassName(): string
+	public function getClassName()
 	{
 		return $this->_className;
 	}
@@ -360,7 +360,7 @@ class SequenceableEntityContainer
 	 *
 	 * @return integer
 	 */
-	public function getBackupSequenceNo(EntityManager $entity_manager, $entity_to_update): int
+	public function getBackupSequenceNo(EntityManager $entity_manager, $entity_to_update)
 	{
 		$query_builder = $entity_manager->createQueryBuilder()
 			->from($this->_className, self::_GetAlias(0))

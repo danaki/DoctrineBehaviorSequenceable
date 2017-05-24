@@ -24,7 +24,7 @@ trait Sequenceable
 	 *
 	 * @author Falko Matthies <falko.matthies@fincallorca.de>
 	 */
-	public function getSequence(): int
+	public function getSequence()
 	{
 		return $this->sequence;
 	}
