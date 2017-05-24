@@ -292,6 +292,26 @@ class SequenceableEntityContainer
 	}
 
 	/**
+	 * Disables the sequenceable filter to get all sequences of an entity.
+	 *
+	 * @param EntityManager $entity_manager
+	 */
+	protected function _disableSequenceableFilter(EntityManager $entity_manager)
+	{
+		$entity_manager->getFilters()->disable(self::$_FilterName);
+	}
+
+	/**
+	 * Enables the sequenceable filter to get only the current entity (with sequence `0`).
+	 *
+	 * @param EntityManager $entity_manager
+	 */
+	protected function _enableSequenceableFilter(EntityManager $entity_manager)
+	{
+		$entity_manager->getFilters()->enable(self::$_FilterName);
+	}
+
+	/**
 	 * Returns the next empty sequence number for a new backup row of the specified entity.
 	 *
 	 * @param EntityManager $entity_manager
@@ -338,7 +358,7 @@ class SequenceableEntityContainer
 			}
 		}
 
-		$entity_manager->getFilters()->disable(self::$_FilterName);
+		$this->_disableSequenceableFilter($entity_manager);
 
 //		dump($query_builder->getDQL());
 //		dump($query_builder->getQuery()->getSQL());
@@ -347,7 +367,7 @@ class SequenceableEntityContainer
 
 		$next_sequence_no = (int) $query_builder->getQuery()->getSingleScalarResult();
 
-		$entity_manager->getFilters()->enable(self::$_FilterName);
+		$this->_enableSequenceableFilter($entity_manager);
 
 		return $next_sequence_no;
 	}
