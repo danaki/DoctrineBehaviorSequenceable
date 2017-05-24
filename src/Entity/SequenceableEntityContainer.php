@@ -61,6 +61,13 @@ class SequenceableEntityContainer
 	protected $_sequenceableIdFields = array();
 
 	/**
+	 * temporary array to save enabled soft-deletable filters
+	 *
+	 * @var string[]
+	 */
+	protected $_disabledSoftDeleteableFilters = array();
+
+	/**
 	 * Searches for the enabled filter SequenceableFilter and saves the name of the filter for further usage.
 	 *
 	 * @param EntityManager $entity_manager
@@ -312,6 +319,41 @@ class SequenceableEntityContainer
 	}
 
 	/**
+	 * Disables the soft-deleteable filter(s) to get even the (sequences of) deleted entities.
+	 *
+	 * @param EntityManager $entity_manager
+	 */
+	protected function _disableSoftDeleteableFilters(EntityManager $entity_manager)
+	{
+		$filter_names = array_keys($entity_manager->getFilters()->getEnabledFilters());
+
+		$softdeleteable_filters = array_filter($filter_names, function ($_filter_name)
+		{
+			return ( preg_match('/soft/i', $_filter_name) === 1 ) && ( preg_match('/delet/i', $_filter_name) === 1 );
+		});
+
+		foreach( $softdeleteable_filters as $_softdeleteable_filter )
+		{
+			$entity_manager->getFilters()->disable($_softdeleteable_filter);
+			array_push($this->_disabledSoftDeleteableFilters, $_softdeleteable_filter);
+		}
+	}
+
+	/**
+	 * Enables the soft-deleteable filter(s) to get only (sequences of) non deleted entities.
+	 *
+	 * @param EntityManager $entity_manager
+	 */
+	protected function _enableSoftDeleteableFilters(EntityManager $entity_manager)
+	{
+		while( !empty($this->_disabledSoftDeleteableFilters) )
+		{
+			$_softdeleteable_filter = array_pop($this->_disabledSoftDeleteableFilters);
+			$entity_manager->getFilters()->enable($_softdeleteable_filter);
+		}
+	}
+
+	/**
 	 * Returns the next empty sequence number for a new backup row of the specified entity.
 	 *
 	 * @param EntityManager $entity_manager
@@ -358,6 +400,7 @@ class SequenceableEntityContainer
 			}
 		}
 
+		$this->_disableSoftDeleteableFilters($entity_manager);
 		$this->_disableSequenceableFilter($entity_manager);
 
 //		dump($query_builder->getDQL());
@@ -368,6 +411,7 @@ class SequenceableEntityContainer
 		$next_sequence_no = (int) $query_builder->getQuery()->getSingleScalarResult();
 
 		$this->_enableSequenceableFilter($entity_manager);
+		$this->_enableSoftDeleteableFilters($entity_manager);
 
 		return $next_sequence_no;
 	}
