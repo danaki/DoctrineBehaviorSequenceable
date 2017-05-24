@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query\Expr\Join;
 use Fincallorca\DoctrineBehaviors\SequenceableBundle\Annotation\SequenceableID;
 use Fincallorca\DoctrineBehaviors\SequenceableBundle\Exception\MappingException;
