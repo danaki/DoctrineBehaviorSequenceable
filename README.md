@@ -1,7 +1,7 @@
 ## Sequenceable behavior extension for Doctrine2
 
-[![LICENSE](https://img.shields.io/badge/release-0.0.1-blue.svg?style=flat)](https://github.com/Fincallorca/DoctrineBehaviorSequenceable/releases/tag/0.0.1)
-[![Packagist](https://img.shields.io/badge/Packagist-0.0.1-blue.svg?style=flat)](https://packagist.org/packages/fincallorca/doctrine-behaviors)
+[![LICENSE](https://img.shields.io/badge/release-0.0.2-blue.svg?style=flat)](https://github.com/Fincallorca/DoctrineBehaviorSequenceable/releases/tag/0.0.2)
+[![Packagist](https://img.shields.io/badge/Packagist-0.0.2-blue.svg?style=flat)](https://packagist.org/packages/fincallorca/doctrine-behaviors)
 [![LICENSE](https://img.shields.io/badge/License-MIT-blue.svg?style=flat)](LICENSE)
 [![https://jquery.com/](https://img.shields.io/badge/Symfony-≥3-red.svg?style=flat)](https://symfony.com/)
 [![https://jquery.com/](https://img.shields.io/badge/Doctrine-≥2.2-red.svg?style=flat)](http://www.doctrine-project.org/)
