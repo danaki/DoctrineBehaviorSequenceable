@@ -1,4 +1,5 @@
 <?php
+
 namespace Fincallorca\DoctrineBehaviors\SequenceableBundle\EventListener;
 
 use Doctrine\Common\EventSubscriber;
@@ -99,8 +100,10 @@ class SequenceableSubscriber implements EventSubscriber
 //			}
 //		}
 
-		// iterate over all entities (to update)
-		foreach( $unit_of_work->getScheduledEntityUpdates() as $_entity )
+		$entities_to_update = $unit_of_work->getScheduledEntityUpdates();
+
+		// iterate over all entities
+		foreach( $entities_to_update as $_entity )
 		{
 			$class_name = get_class($_entity);
 
@@ -116,69 +119,56 @@ class SequenceableSubscriber implements EventSubscriber
 			}
 
 			// create a backup of the whole row
-			$this->_backupEntity($args->getEntityManager(), $_entity);
+			$this->_backupUpdateEntity($args->getEntityManager(), $_entity);
 		}
-
-
 	}
 
 	/**
-	 * Creates a backup of the whole row with a new sequence number.
+	 * Creates a new entity as backup of the given entity which should be updated.
+	 *
+	 * The new backup entity (with the previous origin entity data) will be inserted as new row (with a new id) and gets a new sequence value.
+	 *
+	 * The update entity gets all new values and stays at sequence `0`.
 	 *
 	 * @param EntityManager $entity_manager
 	 * @param Sequenceable  $entity_to_update
 	 */
-	protected function _backupEntity(EntityManager $entity_manager, $entity_to_update)
-	{
-		$unit_of_work = $entity_manager->getUnitOfWork();
-
-		// generate backup entity
-		$backup_entity = $this->_createBackupEntity($entity_manager, $entity_to_update);
-
-		// and schedule entity for insertion
-		$unit_of_work->scheduleForInsert($backup_entity);
-		$unit_of_work->computeChangeSets(); // recompute changeset, see {@link http://stackoverflow.com/questions/9583058/inserting-element-in-doctrine-listener}
-	}
-
-
-	/**
-	 * Creates a backup of the given entity with the origin entity data, a new sequence value and a remove id.
-	 *
-	 * @param EntityManager $entity_manager
-	 * @param Sequenceable  $entity_to_update
-	 *
-	 * @return Sequenceable
-	 */
-	protected function _createBackupEntity(EntityManager $entity_manager, $entity_to_update)
+	protected function _backupUpdateEntity(EntityManager $entity_manager, $entity_to_update)
 	{
 		$class_name = get_class($entity_to_update);
 
 		$meta_class = $this->_classMetadataContainer[ $class_name ]->getClassMetadata();
 
+		// get change set to restore old values in backup entity
 		$change_set = $entity_manager->getUnitOfWork()->getEntityChangeSet($entity_to_update);
 
-		// clone entity
+		// create backup entity
 		$backup_entity = clone $entity_to_update;
 
-		// set a new sequence number
+		// set a new sequence number of backup
 		$backup_entity->setSequence(
 			$this->_classMetadataContainer[ $class_name ]->getBackupSequenceNo($entity_manager, $entity_to_update)
 		);
 
-		// reset origin values
+		// reset origin values of backup
 		foreach( $change_set as $_field_name => $_value )
 		{
+			// old values are saved in $_value[ 0 ], new values in $_value[ 1 ]
 			$meta_class->setFieldValue($backup_entity, $_field_name, $_value[ 0 ]);
 		}
 
-		// remove id
+		// remove id of backup to insert object as new row
 		// attention: generatorType must be {@see ClassMetadata::GENERATOR_TYPE_IDENTITY} if removing the id(s) 
 		foreach( $meta_class->getIdentifierColumnNames() as $_identifier_column_names )
 		{
 			$meta_class->setFieldValue($backup_entity, $_identifier_column_names, null);
 		}
 
-		return $backup_entity;
+		// and schedule entity for insertion
+		$entity_manager->getUnitOfWork()->scheduleForInsert($backup_entity);
+
+		// compute change set, see {@link http://stackoverflow.com/questions/9583058/inserting-element-in-doctrine-listener}
+		$entity_manager->getUnitOfWork()->computeChangeSet($meta_class, $backup_entity);
 	}
 
 }
