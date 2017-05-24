@@ -204,22 +204,18 @@ class SequenceableEntityContainer
 	}
 
 	/**
-	 * Adds indexes to the entity
-	 * - to avoid same sequence number for identical entities and
-	 * - to increase query execution by using the filter {@see \SequenceableBundle\Filter\SequenceableFilter}.
+	 * Adds indexes to the entity to increase the performance of query execution by using the filter {@see \SequenceableBundle\Filter\SequenceableFilter}.
 	 *
 	 * Attention: Call after property {@see SequenceableClassMetadataContainer::_sequenceableIdFields} was initialized.
 	 *
 	 * Example: The tag &#64;SequenceableID was mentioned for columns _date_, _room_id_ and _name_.
-	 * A single unique constraint will be created for all thee columns plus the _sequence_ column:
-	 * - `UNIQ_XXX ('date', 'room_id', 'name', 'sequence')`
-	 * Additionally six indexes (covered from the combination of the three columns) will be created to increase sql speed by using the filter:
+	 * Six indexes (covered from the combination of the three columns) will be created to increase sql speed by using the filter:
 	 * - `IDX_XX1 ('room_id', 'sequence')`
-	 * - `IDX_XX1 ('name', 'sequence')`
-	 * - `IDX_XX1 ('date', 'sequence')`
-	 * - `IDX_XX1 ('room_id', 'name', 'sequence')`
-	 * - `IDX_XX1 ('date', 'name', 'sequence')`
-	 * - `IDX_XX1 ('date', 'room_id', 'sequence')`
+	 * - `IDX_XX2 ('name', 'sequence')`
+	 * - `IDX_XX3 ('date', 'sequence')`
+	 * - `IDX_XX4 ('room_id', 'name', 'sequence')`
+	 * - `IDX_XX5 ('date', 'name', 'sequence')`
+	 * - `IDX_XX6 ('date', 'room_id', 'sequence')`
 	 *
 	 * @param EntityManager $entity_manager
 	 */
@@ -229,7 +225,7 @@ class SequenceableEntityContainer
 		$meta_data_builder = new ClassMetadataBuilder($this->_classMetadata);
 
 		// all columns which are included in the unique constraint
-		$unique_columns = array();
+		$columns = array();
 
 		// add all fields of $this->_sequenceableIdFields
 		foreach( $this->_sequenceableIdFields as $_field )
@@ -242,31 +238,23 @@ class SequenceableEntityContainer
 
 				foreach( $_mapping[ 'joinColumns' ] as $__joinColumns )
 				{
-					array_push($unique_columns, $__joinColumns[ 'name' ]);
+					array_push($columns, $__joinColumns[ 'name' ]);
 				}
-			}
-			// scalar field
+			} // scalar field
 			else
 			{
-				array_push($unique_columns, $_field);
+				array_push($columns, $_field);
 			}
 		}
 
-		$indexes = Math::UniqueCombination($unique_columns);
+		$index_columns = Math::UniqueCombination($columns);
 
 		// add indexes and constraint
-		foreach( $indexes as $_columns )
+		foreach( $index_columns as $_columns )
 		{
 			array_unshift($_columns, 'sequence');
 
-			if( count($_columns) === ( count($unique_columns) + 1 ) )
-			{
-				$meta_data_builder->addUniqueConstraint($_columns, $this->_generateIdentifierName($_columns, 'uniq'));
-			}
-			else
-			{
-				$meta_data_builder->addIndex($_columns, $this->_generateIdentifierName($_columns, 'idx'));
-			}
+			$meta_data_builder->addIndex($_columns, $this->_generateIdentifierName($_columns, 'idx'));
 		}
 
 		// and reset meta data
