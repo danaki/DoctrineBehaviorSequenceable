@@ -445,6 +445,19 @@ class SequenceableEntityContainer
 
 				$_referenced_entity = $this->_classMetadata->getFieldValue($entity_to_insert, $_field);
 
+				// if any of the associated entities does not exists, an existing entity can not be found
+				// return null to avoid error 
+				// "Binding entities to query parameters only allowed for entities that have an identifier."
+				foreach( $this->_classMetadata->getIdentifierFieldNames() as $__id )
+				{
+					$__class_meta = $entity_manager->getClassMetadata(get_class($_referenced_entity));
+
+					if( is_null($__class_meta->getFieldValue($_referenced_entity, $__id)) )
+					{
+						return null;
+					}
+				}
+
 				$query_builder->andWhere(sprintf('%s.%s = ?%d',
 					self::_GetAlias(0),
 					$_field,
