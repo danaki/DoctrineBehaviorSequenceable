@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.3] - 2017-05-26
+
+### Fixed
+* Fixed "Binding entities to query parameters only allowed for entities that have an identifier".
+
 ## [0.0.2] - 2017-05-24
 
 ### Added
