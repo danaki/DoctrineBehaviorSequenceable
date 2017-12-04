@@ -125,6 +125,7 @@ class SequenceableEntityContainer
 	 * @param ClassMetadata $class_meta
 	 *
 	 * @throws MappingException
+	 * @throws \Doctrine\ORM\Mapping\MappingException
 	 */
 	public function __construct(ClassMetadata $class_meta, EntityManager $entity_manager)
 	{
@@ -156,7 +157,7 @@ class SequenceableEntityContainer
 	}
 
 	/**
-	 *
+	 * @throws \Doctrine\ORM\Mapping\MappingException
 	 */
 	protected function _initializeSequenceColumn()
 	{
@@ -222,6 +223,8 @@ class SequenceableEntityContainer
 	 * - `IDX_XX6 ('date', 'room_id', 'sequence')`
 	 *
 	 * @param EntityManager $entity_manager
+	 *
+	 * @throws \Doctrine\ORM\Mapping\MappingException
 	 */
 	protected function _initializeIndexes(EntityManager $entity_manager)
 	{
@@ -358,6 +361,10 @@ class SequenceableEntityContainer
 	 * @param Sequenceable  $entity_to_update
 	 *
 	 * @return integer
+	 *
+	 * @throws NoResultException
+	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \Doctrine\ORM\NonUniqueResultException
 	 */
 	public function getBackupSequenceNo(EntityManager $entity_manager, $entity_to_update)
 	{
@@ -419,6 +426,9 @@ class SequenceableEntityContainer
 	 * @param Sequenceable  $entity_to_insert
 	 *
 	 * @return Sequenceable|null
+	 *
+	 * @throws \Doctrine\DBAL\DBALException
+	 * @throws \Doctrine\ORM\NonUniqueResultException
 	 */
 	public function getDeletedEntity(EntityManager $entity_manager, $entity_to_insert)
 	{
