@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\Builder\ClassMetadataBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\NoResultException;
-use Doctrine\ORM\Query\Expr\Join;
 use Fincallorca\DoctrineBehaviors\SequenceableBundle\Annotation\SequenceableID;
 use Fincallorca\DoctrineBehaviors\SequenceableBundle\Exception\MappingException;
 use Fincallorca\DoctrineBehaviors\SequenceableBundle\Filter\SequenceableFilter;
@@ -327,8 +326,7 @@ class SequenceableEntityContainer
 	{
 		$filter_names = array_keys($entity_manager->getFilters()->getEnabledFilters());
 
-		$softdeleteable_filters = array_filter($filter_names, function ($_filter_name)
-		{
+		$softdeleteable_filters = array_filter($filter_names, function ($_filter_name) {
 			return ( preg_match('/soft/i', $_filter_name) === 1 ) && ( preg_match('/delet/i', $_filter_name) === 1 );
 		});
 
@@ -367,8 +365,6 @@ class SequenceableEntityContainer
 			->from($this->_className, self::_GetAlias(0))
 			->select("MAX(t0.sequence) + 1 AS max_sequence");
 
-		$alias_index = 0;
-
 		$field = null;
 
 		foreach( $this->_sequenceableIdFields as $_field )
@@ -376,18 +372,17 @@ class SequenceableEntityContainer
 			// mapping field
 			if( $this->_classMetadata->hasAssociation($_field) )
 			{
-				$alias_index++;
+				$_field_value = $this->_classMetadata->getFieldValue($entity_to_update, $_field);
 
-				$mapping = $this->_classMetadata->getAssociationMapping($_field);
-
-				$query_builder->innerJoin($mapping[ 'targetEntity' ], self::_GetAlias($alias_index), Join::WITH, $query_builder->expr()->eq(
-					self::_GetAlias($alias_index),
-					sprintf('%s.%s', self::_GetAlias(0), $_field))
-				);
+				$query_builder->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_field));
+				$query_builder->setParameter($_field, $_field_value);
 			}
 			// scalar field
 			else
 			{
+
+				// conversion to database value is necessary
+				// because for instance date columns saves datetime values and sp comparisons of date columns could fail  
 				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_field))->convertToDatabaseValue(
 					$this->_classMetadata->getFieldValue($entity_to_update, $_field),
 					$entity_manager->getConnection()->getDatabasePlatform()
@@ -515,8 +510,7 @@ class SequenceableEntityContainer
 	 */
 	protected function _generateIdentifierName($columnNames, $prefix = '', $maxSize = 30)
 	{
-		$hash = implode("", array_map(function ($column)
-		{
+		$hash = implode("", array_map(function ($column) {
 			return dechex(crc32($column));
 		}, $columnNames));
 
