@@ -235,13 +235,13 @@ class SequenceableEntityContainer
 		$unique_columns = array();
 
 		// add all fields of $this->_sequenceableIdFields
-		foreach( $this->_sequenceableIdFields as $_field )
+		foreach( $this->_sequenceableIdFields as $_fieldName )
 		{
 			// mapping field
-			if( $this->_classMetadata->hasAssociation($_field) )
+			if( $this->_classMetadata->hasAssociation($_fieldName) )
 			{
 
-				$_mapping = $this->_classMetadata->getAssociationMapping($_field);
+				$_mapping = $this->_classMetadata->getAssociationMapping($_fieldName);
 
 				foreach( $_mapping[ 'joinColumns' ] as $__joinColumns )
 				{
@@ -250,7 +250,7 @@ class SequenceableEntityContainer
 			} // scalar field
 			else
 			{
-				array_push($unique_columns, $_field);
+				array_push($unique_columns, $this->_classMetadata->getColumnName($_fieldName));
 			}
 		}
 
@@ -374,15 +374,15 @@ class SequenceableEntityContainer
 
 		$field = null;
 
-		foreach( $this->_sequenceableIdFields as $_field )
+		foreach( $this->_sequenceableIdFields as $_fieldName )
 		{
 			// mapping field
-			if( $this->_classMetadata->hasAssociation($_field) )
+			if( $this->_classMetadata->hasAssociation($_fieldName) )
 			{
-				$_field_value = $this->_classMetadata->getFieldValue($entity_to_update, $_field);
+				$_field_value = $this->_classMetadata->getFieldValue($entity_to_update, $_fieldName);
 
-				$query_builder->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_field));
-				$query_builder->setParameter($_field, $_field_value);
+				$query_builder->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_fieldName));
+				$query_builder->setParameter($_fieldName, $_field_value);
 			}
 			// scalar field
 			else
@@ -390,14 +390,14 @@ class SequenceableEntityContainer
 
 				// conversion to database value is necessary
 				// because for instance date columns saves datetime values and sp comparisons of date columns could fail  
-				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_field))->convertToDatabaseValue(
-					$this->_classMetadata->getFieldValue($entity_to_update, $_field),
+				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_fieldName))->convertToDatabaseValue(
+					$this->_classMetadata->getFieldValue($entity_to_update, $_fieldName),
 					$entity_manager->getConnection()->getDatabasePlatform()
 				);
 
 				$query_builder
-					->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_field))
-					->setParameter($_field, $_field_value);
+					->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_fieldName))
+					->setParameter($_fieldName, $_field_value);
 
 			}
 		}
@@ -441,14 +441,14 @@ class SequenceableEntityContainer
 
 		$field = null;
 
-		foreach( $this->_sequenceableIdFields as $_field )
+		foreach( $this->_sequenceableIdFields as $_fieldName )
 		{
 			// mapping field
-			if( $this->_classMetadata->hasAssociation($_field) )
+			if( $this->_classMetadata->hasAssociation($_fieldName) )
 			{
 				$alias_index++;
 
-				$_referenced_entity = $this->_classMetadata->getFieldValue($entity_to_insert, $_field);
+				$_referenced_entity = $this->_classMetadata->getFieldValue($entity_to_insert, $_fieldName);
 
 				// if any of the associated entities does not exists, an existing entity can not be found
 				// return null to avoid error 
@@ -465,7 +465,7 @@ class SequenceableEntityContainer
 
 				$query_builder->andWhere(sprintf('%s.%s = ?%d',
 					self::_GetAlias(0),
-					$_field,
+					$_fieldName,
 					$alias_index
 				));
 
@@ -474,14 +474,14 @@ class SequenceableEntityContainer
 			} // scalar field
 			else
 			{
-				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_field))->convertToDatabaseValue(
-					$this->_classMetadata->getFieldValue($entity_to_insert, $_field),
+				$_field_value = Type::getType($this->_classMetadata->getTypeOfField($_fieldName))->convertToDatabaseValue(
+					$this->_classMetadata->getFieldValue($entity_to_insert, $_fieldName),
 					$entity_manager->getConnection()->getDatabasePlatform()
 				);
 
 				$query_builder
-					->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_field))
-					->setParameter($_field, $_field_value);
+					->andWhere(sprintf('%s.%s = :%2$s', self::_GetAlias(0), $_fieldName))
+					->setParameter($_fieldName, $_field_value);
 			}
 		}
 

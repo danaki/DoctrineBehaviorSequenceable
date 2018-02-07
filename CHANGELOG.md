@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.0.5] - 2018-01-07
+
+### Fixed
+- Fixed incorrect assignment of column name (used field name before).
+
 ## [0.0.4] - 2017-12-04
 
 ### Fixed
